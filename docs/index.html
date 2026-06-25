@@ -5,123 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infovis - Análisis de Rango Vocal</title>
     <style>
+        /* RESET & BASE */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            background-color: #121212; color: #ffffff;
+            margin: 0; padding: 20px;
+        }
+
+        /* DISEÑO DE 2 COLUMNAS */
+        .main-layout {
+            display: flex; gap: 30px; align-items: flex-start;
+            max-width: 1400px; margin: 0 auto;
+        }
+
+        /* COLUMNA IZQUIERDA (Fija/Sticky) */
+        .left-col {
+            flex: 0 0 380px;
+            position: sticky; top: 20px; /* Se queda pegada al hacer scroll */
         }
         .header-panel {
             background: #1e1e1e; padding: 30px 20px; border-radius: 12px;
-            text-align: center; margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-top: 4px solid #1DB954;
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-top: 4px solid #1DB954;
         }
-        .header-panel h1 { margin-top: 0; font-size: 32px; }
-        .header-panel p { font-size: 16px; color: #ccc; line-height: 1.6; max-width: 650px; margin: 0 auto 20px auto; }
+        .header-panel h1 { margin-top: 0; font-size: 28px; line-height: 1.2; }
+        .header-panel p { font-size: 15px; color: #ccc; line-height: 1.6; margin-bottom: 20px; }
 
         .btn-start {
-            background-color: #1DB954; color: white; border: none; padding: 15px 40px;
-            font-size: 20px; font-weight: bold; border-radius: 30px; cursor: pointer;
-            box-shadow: 0 0 15px rgba(29, 185, 84, 0.4); transition: 0.3s; margin: 10px;
+            background-color: #1DB954; color: white; border: none; padding: 15px 30px;
+            font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 0 15px rgba(29, 185, 84, 0.4); transition: 0.3s; width: 100%;
         }
-        .btn-start:hover { transform: scale(1.05); background-color: #1ed760; box-shadow: 0 0 25px rgba(29, 185, 84, 0.6); }
-        .btn-reset { background-color: #ff9800; padding: 10px 20px; font-size: 16px; box-shadow: 0 0 10px rgba(255, 152, 0, 0.4); }
+        .btn-start:hover { transform: scale(1.03); background-color: #1ed760; box-shadow: 0 0 25px rgba(29, 185, 84, 0.6); }
+        .btn-reset { background-color: #ff9800; margin-top: 10px; box-shadow: 0 0 10px rgba(255, 152, 0, 0.4); }
         .btn-reset:hover { background-color: #ffb74d; }
 
-        .live-stats { display: flex; justify-content: space-around; margin-top: 15px; font-size: 18px; }
-        .val { font-size: 28px; font-weight: bold; color: #1DB954; }
+        .live-stats { display: flex; justify-content: space-around; margin-top: 20px; font-size: 16px; background: #111; padding: 10px; border-radius: 8px; }
+        .val { font-size: 24px; font-weight: bold; color: #1DB954; }
 
         .story-panel {
             background: linear-gradient(135deg, #1DB954 0%, #127334 100%); color: white;
             padding: 20px; border-radius: 12px; margin-top: 20px; text-align: left;
-            display: flex; flex-direction: column; gap: 8px;
             box-shadow: 0 6px 15px rgba(29, 185, 84, 0.2); animation: fadeIn 0.5s ease;
         }
-        .story-title { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-        .story-text { font-size: 16px; opacity: 0.95; line-height: 1.5; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .story-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+        .story-text { font-size: 15px; opacity: 0.95; line-height: 1.5; }
 
-        .songs-panel {
+        /* COLUMNA DERECHA (Lista de Canciones y Matriz) */
+        .right-col { flex: 1; min-width: 0; }
+
+        .infovis-board {
             background: #1b1b1b; border: 1px solid #2a2a2a; border-radius: 16px;
-            max-height: 520px; overflow-y: auto; padding: 18px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.25); margin-bottom: 20px;
-        }
-        .songs-panel h2 { margin: 0; font-size: 22px; font-weight: 700; color: #ffffff; }
-
-        /* Flexbox dinámico para el contenedor de canciones */
-        #songsContainer {
-            display: flex; flex-direction: column; gap: 15px; margin-top: 15px;
+            overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            position: relative;
         }
 
-        .song-card {
-            background: #282828; padding: 15px; border-radius: 8px; position: relative; overflow: hidden;
-        }
-        .song-info { display: flex; justify-content: space-between; margin-bottom: 12px; }
-        .song-title { font-size: 18px; font-weight: bold; }
-        .feedback-text { font-size: 14px; text-align: right; max-width: 50%; font-weight: 600; padding-left: 10px; }
+        /* ESTRUCTURA DE FILAS (Gantt Chart Layout) */
+        .row-flex { display: flex; width: 100%; border-bottom: 1px solid #252525; }
+        .info-space { flex: 0 0 280px; padding: 15px; box-sizing: border-box; background: #1e1e1e; z-index: 2; }
+        .track-space { flex: 1; position: relative; padding: 0; box-sizing: border-box; }
 
-        /* DISEÑO DEL PIANO */
-        .viz-track {
-            width: 100%; height: 40px; border-radius: 4px; position: relative; 
-            border: 1px solid #111; display: flex; background: #000; overflow: hidden;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-        }
+        /* Cabecera del Piano */
+        .board-header .info-space { background: #111; display: flex; align-items: center; justify-content: center; }
+        .board-header h2 { margin: 0; font-size: 18px; color: #fff; }
+        .piano-container { display: flex; height: 40px; background: #000; border-bottom: 2px solid #333; }
         .pkey { flex: 1; position: relative; box-sizing: border-box; }
         .pkey.white { background: #eaeaea; border-right: 1px solid #bbb; border-bottom: 1px solid #ccc; }
-        .pkey.black { background: #1a1a1a; z-index: 1; border-right: 1px solid #000; }
+        .pkey.black { background: #1a1a1a; z-index: 3; border-right: 1px solid #000; }
         .c4-label {
             position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
             color: #e74c3c; font-size: 10px; font-weight: 900; z-index: 10;
             background: rgba(255,255,255,0.8); padding: 0 2px; border-radius: 2px;
         }
+
+        /* Estilos de las tarjetas de canciones */
+        #songsContainer { display: flex; flex-direction: column; position: relative; }
+        .song-row { background: transparent; transition: background 0.2s; }
+        .song-row:hover { background: rgba(255,255,255,0.02); }
+        .song-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+        .song-artist { font-size: 13px; color: #aaa; margin-bottom: 8px; }
+        .feedback-text { font-size: 13px; font-weight: 600; line-height: 1.3; }
+
+        /* LAS BARRAS VISUALES */
         .viz-song-range {
-            position: absolute; height: 100%; pointer-events: none;
-            background: rgba(52, 152, 219, 0.25);
-            border-left: 3px solid #3498db; border-right: 3px solid #3498db; z-index: 2;
-        }
-        .viz-user-range {
-            position: absolute; height: 100%; pointer-events: none;
-            background: rgba(29, 185, 84, 0.55);
-            border-top: 4px solid #1DB954; border-bottom: 4px solid #1DB954;
-            transition: left 0.1s, width 0.1s; z-index: 3;
+            position: absolute; top: 50%; transform: translateY(-50%); height: 16px;
+            background: rgba(52, 152, 219, 0.4); border: 1px solid #3498db;
+            border-radius: 4px; pointer-events: none; z-index: 5;
         }
 
+        /* LA MAGIA: LA BARRA VERDE GLOBAL */
+        .bg-layer { position: absolute; top: 0; bottom: 0; left: 0; right: 0; display: flex; pointer-events: none; z-index: 1; }
+        .bg-layer .info-space { background: transparent; border: none; }
+        .bg-layer .track-space { position: relative; border-left: 2px solid #333; background: rgba(0,0,0,0.2); }
+
+        #globalUserRange {
+            position: absolute; top: 0; bottom: 0;
+            background: rgba(29, 185, 84, 0.15); /* Verde translúcido que cruza todo */
+            border-left: 2px solid #1DB954; border-right: 2px solid #1DB954;
+            transition: left 0.1s, width 0.1s;
+            box-shadow: 0 0 20px rgba(29, 185, 84, 0.1);
+        }
+
+        /* Colores de estado */
         .status-perfect { color: #1DB954; } 
         .status-transpose { color: #ffc107; } 
         .status-impossible { color: #e74c3c; } 
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="header-panel">
-    <h1>🎤 ¿Qué canción puedes cantar con tu voz?</h1>
-    <p id="instructions">Freddie Mercury tenía una extensión vocal increíble de casi 4 octavas y podía cantar prácticamente cualquier cosa. <b>¿Y tú?</b> Activa el micrófono, canta tu nota más grave deslizando hasta la más aguda, y descubre cuáles de estas canciones calzan con tu registro.</p>
+<div class="main-layout">
 
-    <button id="btnStart" class="btn-start" onclick="startSystem()">Descubrir mi rango</button>
-    <button id="btnReset" class="btn-start btn-reset" style="display:none;" onclick="resetRange()">🔄 Reiniciar Rango</button>
+    <div class="left-col">
+        <div class="header-panel">
+            <h1>🎤 ¿Qué canción puedes cantar con tu voz?</h1>
+            <p id="instructions">Freddie Mercury tenía una extensión vocal increíble de casi 4 octavas y podía cantar prácticamente cualquier cosa. <b>¿Y tú?</b> Activa el micrófono, canta tu nota más grave y desliza hasta la más aguda para descubrir tu rango real.</p>
 
-    <div id="statsPanel" class="live-stats" style="display: none;">
-        <div>Grave<br><span id="valMin" class="val">-</span></div>
-        <div>Escuchando...<br><span id="valCurrent" class="val" style="color:white;">-</span></div>
-        <div>Agudo<br><span id="valMax" class="val">-</span></div>
-        <div>Extensión<br><span id="valSpan" class="val">0</span> <small>semitonos</small></div>
+            <button id="btnStart" class="btn-start" onclick="startSystem()">Descubrir mi rango</button>
+            <button id="btnReset" class="btn-start btn-reset" style="display:none;" onclick="resetRange()">🔄 Reiniciar Rango</button>
+
+            <div id="statsPanel" class="live-stats" style="display: none;">
+                <div>Grave<br><span id="valMin" class="val">-</span></div>
+                <div>Actual<br><span id="valCurrent" class="val" style="color:white;">-</span></div>
+                <div>Agudo<br><span id="valMax" class="val">-</span></div>
+                <div>Extensión<br><span id="valSpan" class="val">0</span></div>
+            </div>
+        </div>
+
+        <div id="storyPanel" class="story-panel" style="display: none;">
+            <div class="story-title">✨ <span id="storyTitle">Calculando tu perfil...</span></div>
+            <div class="story-text" id="storyText">Explora tus graves y agudos para que podamos definir tu tipo de voz.</div>
+        </div>
     </div>
 
-    <div id="storyPanel" class="story-panel" style="display: none;">
-        <div class="story-title">✨ <span id="storyTitle">Calculando tu perfil...</span></div>
-        <div class="story-text" id="storyText">Explora tus graves y agudos para que podamos definir tu tipo de voz.</div>
-    </div>
-</div>
+    <div class="right-col">
+        <div class="infovis-board">
 
-<div class="songs-panel">
-    <h2>Lista de Canciones</h2>
-    <p style="color:#aaa; font-size:14px; margin-top:-5px; margin-bottom:0;">Ordenadas de Mayor compatibilidad a Imposibles.</p>
-    <div id="songsContainer"></div>
+            <div class="bg-layer">
+                <div class="info-space"></div>
+                <div class="track-space">
+                    <div id="globalUserRange" style="left: 0%; width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="board-header row-flex">
+                <div class="info-space">
+                    <h2>Lista de Canciones</h2>
+                </div>
+                <div class="track-space piano-container" id="pianoHeader">
+                    </div>
+            </div>
+
+            <div id="songsContainer">
+                </div>
+
+        </div>
+    </div>
 </div>
 
 <script>
+// Compatibilidad micrófono VS Code
 if (window.AnalyserNode && !window.AnalyserNode.prototype.getFloat32TimeDomainData) {
     let uint8 = new Uint8Array(2048);
     window.AnalyserNode.prototype.getFloat32TimeDomainData = function(array) {
@@ -129,6 +174,7 @@ if (window.AnalyserNode && !window.AnalyserNode.prototype.getFloat32TimeDomainDa
         for (let i = 0, imax = array.length; i < imax; i++) array[i] = (uint8[i] - 128) * 0.0078125;
     };
 }
+
 const songs = [{"track_name": "Saturday", "artist_name": "Twenty One Pilots", "min_midi": 63, "max_midi": 80}, {"track_name": "Stressed Out", "artist_name": "Twenty One Pilots", "min_midi": 64, "max_midi": 81}, {"track_name": "My Universe", "artist_name": "Coldplay X BTS", "min_midi": 54, "max_midi": 83}, {"track_name": "Heat Waves", "artist_name": "Glass Animals", "min_midi": 59, "max_midi": 78}, {"track_name": "To Die For", "artist_name": "Sam Smith", "min_midi": 67, "max_midi": 81}, {"track_name": "In Your Eyes", "artist_name": "The Weeknd", "min_midi": 65, "max_midi": 82}, {"track_name": "Everything I Wanted", "artist_name": "Billie Eilish", "min_midi": 52, "max_midi": 71}, {"track_name": "Circles", "artist_name": "Post Malone", "min_midi": 60, "max_midi": 79}, {"track_name": "Adore You", "artist_name": "Harry Styles", "min_midi": 70, "max_midi": 82}, {"track_name": "Blinding Lights", "artist_name": "The Weeknd", "min_midi": 65, "max_midi": 84}, {"track_name": "Nothing Else Matters", "artist_name": "Metallica", "min_midi": 62, "max_midi": 72}, {"track_name": "I Wanna Be Yours", "artist_name": "Arctic Monkeys", "min_midi": 58, "max_midi": 70}, {"track_name": "Drown", "artist_name": "Bring Me the Horizon", "min_midi": 59, "max_midi": 83}, {"track_name": "Sleepwalking", "artist_name": "Bring Me the Horizon", "min_midi": 64, "max_midi": 84}, {"track_name": "My Eyes Have Seen You", "artist_name": "The Doors", "min_midi": 69, "max_midi": 83}, {"track_name": "Don't Threaten Me with a Good Time", "artist_name": "Panic! At The Disco", "min_midi": 61, "max_midi": 85}, {"track_name": "Mercy", "artist_name": "Muse", "min_midi": 62, "max_midi": 84}, {"track_name": "Under Pressure", "artist_name": "Queen", "min_midi": 61, "max_midi": 86}, {"track_name": "Creep", "artist_name": "Radiohead", "min_midi": 59, "max_midi": 83}, {"track_name": "Basket Case", "artist_name": "Green Day", "min_midi": 64, "max_midi": 78}, {"track_name": "Everlong", "artist_name": "Foo Fighters", "min_midi": 59, "max_midi": 81}, {"track_name": "No One Knows", "artist_name": "Queens Of The Stone Age", "min_midi": 67, "max_midi": 83}, {"track_name": "Psycho", "artist_name": "Muse", "min_midi": 57, "max_midi": 86}, {"track_name": "Beautiful Day", "artist_name": "U2", "min_midi": 57, "max_midi": 81}, {"track_name": "Boulevard of Broken Dreams", "artist_name": "Green Day", "min_midi": 65, "max_midi": 80}, {"track_name": "Vertigo", "artist_name": "U2", "min_midi": 64, "max_midi": 83}, {"track_name": "Wake Me Up When September Ends", "artist_name": "Green Day", "min_midi": 62, "max_midi": 76}, {"track_name": "Knights of Cydonia", "artist_name": "Muse", "min_midi": 59, "max_midi": 88}, {"track_name": "Starlight", "artist_name": "Muse", "min_midi": 68, "max_midi": 83}, {"track_name": "Paint It Black", "artist_name": "The Rolling Stones", "min_midi": 64, "max_midi": 77}, {"track_name": "Hotel California", "artist_name": "The Eagles", "min_midi": 64, "max_midi": 82}];
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -138,8 +184,9 @@ function midiToNote(midi) {
 }
 
 const VISUAL_MIN_MIDI = 36; // C2
-const VISUAL_RANGE_SPAN = 60; // 5 Octavas (hasta B6)
+const VISUAL_RANGE_SPAN = 60; // 5 Octavas exactas (hasta B6)
 
+// 1. Construir el Piano de la Cabecera
 let pianoHtml = '';
 for (let i = VISUAL_MIN_MIDI; i < VISUAL_MIN_MIDI + VISUAL_RANGE_SPAN; i++) {
     let note = i % 12;
@@ -148,12 +195,13 @@ for (let i = VISUAL_MIN_MIDI; i < VISUAL_MIN_MIDI + VISUAL_RANGE_SPAN; i++) {
     let label = isC4 ? '<span class="c4-label">C4</span>' : '';
     pianoHtml += `<div class="pkey ${isBlack ? 'black' : 'white'}">${label}</div>`;
 }
+document.getElementById("pianoHeader").innerHTML = pianoHtml;
 
 let audioCtx, analyser, buf;
 let uMin = Infinity, uMax = -Infinity;
 let isListening = false;
 
-// Construimos el HTML una sola vez al inicio
+// 2. Construir la estructura de Filas (Gantt Chart)
 function buildInitialUI() {
     const container = document.getElementById("songsContainer");
     container.innerHTML = "";
@@ -164,16 +212,14 @@ function buildInitialUI() {
         const widthPercent = (sSpan / VISUAL_RANGE_SPAN) * 100;
 
         container.innerHTML += `
-            <div class="song-card" id="card-${song.track_name.replace(/\s/g,'')}" style="order: ${index};">
-                <div class="song-info">
-                    <div class="song-title">${song.track_name} <span style="font-weight:normal; font-size:14px; color:#aaa;">- ${song.artist_name}</span></div>
+            <div class="song-row row-flex" id="card-${song.track_name.replace(/\s/g,'')}" style="order: ${index};">
+                <div class="info-space">
+                    <div class="song-title">${song.track_name}</div>
+                    <div class="song-artist">${song.artist_name}</div>
                     <div class="feedback-text" id="feedback-${song.track_name.replace(/\s/g,'')}">Esperando tu voz...</div>
                 </div>
-
-                <div class="viz-track">
-                    ${pianoHtml}
+                <div class="track-space">
                     <div class="viz-song-range" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
-                    <div class="viz-user-range" id="uviz-${song.track_name.replace(/\s/g,'')}" style="left: 0%; width: 0%;"></div>
                 </div>
             </div>
         `;
@@ -211,12 +257,14 @@ function resetRange() {
     document.getElementById("storyTitle").innerText = "Calculando tu perfil...";
     document.getElementById("storyText").innerText = "Explora tus graves y agudos para que podamos definir tu tipo de voz.";
 
+    // Resetear barra global
+    document.getElementById("globalUserRange").style.width = "0%";
+
     songs.forEach((song, index) => {
         const id = song.track_name.replace(/\s/g,'');
         document.getElementById("feedback-" + id).innerText = "Esperando tu voz...";
         document.getElementById("feedback-" + id).className = "feedback-text";
-        document.getElementById("uviz-" + id).style.width = "0%";
-        document.getElementById("card-" + id).style.order = index; // Reset orden
+        document.getElementById("card-" + id).style.order = index;
     });
 }
 
@@ -273,20 +321,26 @@ function updateVisualizations() {
 
     const uSpan = uMax - uMin;
 
-    // 1. Calculamos la categoría y los valores para ordenamiento
+    // 1. Actualizar la ÚNICA BARRA GLOBAL de usuario
+    const globalViz = document.getElementById("globalUserRange");
+    const globalLeftP = ((uMin - VISUAL_MIN_MIDI) / VISUAL_RANGE_SPAN) * 100;
+    const globalWidthP = (uSpan / VISUAL_RANGE_SPAN) * 100;
+    globalViz.style.left = globalLeftP + "%";
+    globalViz.style.width = globalWidthP + "%";
+
+    // 2. Calcular categorías de semáforo
     songs.forEach(song => {
         song.sSpan = song.max_midi - song.min_midi;
 
         if (song.sSpan > uSpan) {
-            song.cat = 3; // ROJO: Imposible
-            song.spanDiff = song.sSpan - uSpan; // Faltante
+            song.cat = 3; // Rojo
+            song.spanDiff = song.sSpan - uSpan; 
         } else {
             let bestT = 0, minRem = Infinity, bestOct = 0;
-            // Evaluamos todos los posibles ajustes de transposición (-60 a +60)
             for (let T = -60; T <= 60; T++) {
                 if (song.min_midi + T >= uMin && song.max_midi + T <= uMax) {
                     let oct = Math.round(T / 12);
-                    let rem = T - oct * 12; // Cuántos semitonos fuera de la octava perfecta
+                    let rem = T - oct * 12; 
                     if (Math.abs(rem) < minRem || (Math.abs(rem) === minRem && Math.abs(oct) < Math.abs(bestOct))) {
                         minRem = Math.abs(rem);
                         bestT = T;
@@ -294,39 +348,29 @@ function updateVisualizations() {
                     }
                 }
             }
-            song.minRem = minRem; // Semitonos sobrantes
-            song.bestOct = bestOct; // Octavas desplazadas
-            song.cat = (minRem === 0) ? 1 : 2; // VERDE si no sobran semitonos, AMARILLO si requiere ajuste
+            song.minRem = minRem; 
+            song.bestOct = bestOct; 
+            song.cat = (minRem === 0) ? 1 : 2; // 1 = Verde, 2 = Amarillo
         }
     });
 
-    // 2. Ordenamos usando CSS Flexbox 'order' para no recargar el DOM
+    // 3. Reordenamiento visual Flexbox
     let sortedSongs = [...songs];
     sortedSongs.sort((a, b) => {
-        if (a.cat !== b.cat) return a.cat - b.cat; // Primero Verde (1), luego Amarillo (2), luego Rojo (3)
+        if (a.cat !== b.cat) return a.cat - b.cat;
         if (a.cat === 1) return Math.abs(a.bestOct) - Math.abs(b.bestOct);
         if (a.cat === 2) return Math.abs(a.minRem) - Math.abs(b.minRem);
-        if (a.cat === 3) return a.spanDiff - b.spanDiff; // El rojo con menos diferencia primero
+        if (a.cat === 3) return a.spanDiff - b.spanDiff; 
         return 0;
     });
 
-    // 3. Aplicamos el orden y actualizamos textos y barras
     sortedSongs.forEach((song, visualIndex) => {
         const id = song.track_name.replace(/\s/g,'');
         const cardEl = document.getElementById("card-" + id);
         const feedbackEl = document.getElementById("feedback-" + id);
-        const viz = document.getElementById("uviz-" + id);
 
-        // Reordenamiento instantáneo sin parpadeos
-        cardEl.style.order = visualIndex;
+        cardEl.style.order = visualIndex; // Reordenamiento sin parpadeos
 
-        // Actualizar barra de voz del usuario
-        const leftP = ((uMin - VISUAL_MIN_MIDI) / VISUAL_RANGE_SPAN) * 100;
-        const widthP = (uSpan / VISUAL_RANGE_SPAN) * 100;
-        viz.style.left = leftP + "%";
-        viz.style.width = widthP + "%";
-
-        // Actualizar Textos (Semáforo)
         if (song.cat === 3) {
             feedbackEl.innerText = `❌ Imposible. Faltan ${song.spanDiff} semitonos de extensión.`;
             feedbackEl.className = "feedback-text status-impossible";
@@ -339,7 +383,6 @@ function updateVisualizations() {
             }
             feedbackEl.className = "feedback-text status-perfect";
         } else if (song.cat === 2) {
-            // Lógica Espacial Textual
             let action = song.minRem < 0 ? `Baja la pista (hazla más grave)` : `Sube la pista (hazla más aguda)`;
             let msg = `⚠️ ${action} ${Math.abs(song.minRem)} semitonos`;
 
