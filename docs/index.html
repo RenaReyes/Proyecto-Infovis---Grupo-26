@@ -15,98 +15,117 @@
         }
         .header-panel {
             background: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px 20px;
+            border-radius: 12px;
             text-align: center;
             margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-top: 4px solid #1DB954;
         }
+        .header-panel h1 { margin-top: 0; font-size: 32px; }
+        .header-panel p { font-size: 16px; color: #ccc; line-height: 1.6; max-width: 650px; margin: 0 auto 20px auto; }
+
         .btn-start {
             background-color: #1DB954; color: white; border: none; padding: 15px 40px;
             font-size: 20px; font-weight: bold; border-radius: 30px; cursor: pointer;
             box-shadow: 0 0 15px rgba(29, 185, 84, 0.4); transition: 0.3s; margin: 10px;
         }
-        .btn-start:hover { transform: scale(1.05); background-color: #1ed760; }
+        .btn-start:hover { transform: scale(1.05); background-color: #1ed760; box-shadow: 0 0 25px rgba(29, 185, 84, 0.6); }
 
-        .btn-reset {
-            background-color: #ff9800; padding: 10px 20px; font-size: 16px; box-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
-        }
+        .btn-reset { background-color: #ff9800; padding: 10px 20px; font-size: 16px; box-shadow: 0 0 10px rgba(255, 152, 0, 0.4); }
         .btn-reset:hover { background-color: #ffb74d; }
 
-        .live-stats {
-            display: flex; justify-content: space-around; margin-top: 15px; font-size: 18px;
-        }
+        .live-stats { display: flex; justify-content: space-around; margin-top: 15px; font-size: 18px; }
         .val { font-size: 28px; font-weight: bold; color: #1DB954; }
 
+        .story-panel {
+            background: linear-gradient(135deg, #1DB954 0%, #127334 100%); color: white;
+            padding: 20px; border-radius: 12px; margin-top: 20px; text-align: left;
+            display: flex; flex-direction: column; gap: 8px;
+            box-shadow: 0 6px 15px rgba(29, 185, 84, 0.2); animation: fadeIn 0.5s ease;
+        }
+        .story-title { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .story-text { font-size: 16px; opacity: 0.95; line-height: 1.5; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
         .songs-panel {
-            background: #1b1b1b;
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            max-height: 520px;
-            overflow-y: auto;
-            padding: 18px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-            margin-bottom: 20px;
+            background: #1b1b1b; border: 1px solid #2a2a2a; border-radius: 16px;
+            max-height: 520px; overflow-y: auto; padding: 18px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25); margin-bottom: 20px;
         }
-        .songs-panel h2 {
-            margin: 0 0 14px;
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffffff;
-        }
+        .songs-panel h2 { margin: 0; font-size: 22px; font-weight: 700; color: #ffffff; }
+
         .song-card {
-            background: #282828; padding: 15px; border-radius: 8px; margin-bottom: 15px;
+            background: #282828; padding: 15px; border-radius: 8px; margin-top: 15px;
             position: relative; overflow: hidden;
             transition: background 0.3s, opacity 0.25s ease, transform 0.25s ease;
-            opacity: 0;
-            animation: songCardEnter 0.25s ease forwards;
+            opacity: 0; animation: songCardEnter 0.25s ease forwards;
             animation-delay: calc(var(--entry-index, 0) * 0.03s);
         }
-        .song-info { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .song-info { display: flex; justify-content: space-between; margin-bottom: 12px; }
         .song-title { font-size: 18px; font-weight: bold; }
-        .feedback-text { font-size: 14px; text-align: right; max-width: 50%; font-weight: 500; }
-        @keyframes songCardEnter {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .feedback-text { font-size: 14px; text-align: right; max-width: 50%; font-weight: 600; padding-left: 10px; }
+        @keyframes songCardEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* NUEVO DISEÑO DEL PIANO (INFOVIS) */
+        .viz-track {
+            width: 100%; height: 40px; border-radius: 4px; position: relative; 
+            border: 1px solid #111; display: flex; background: #000; overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .pkey { flex: 1; position: relative; box-sizing: border-box; }
+        .pkey.white { background: #eaeaea; border-right: 1px solid #bbb; border-bottom: 1px solid #ccc; }
+        .pkey.black { background: #1a1a1a; z-index: 1; border-right: 1px solid #000; }
+
+        /* Marca del Do Central (C4) */
+        .c4-label {
+            position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+            color: #e74c3c; font-size: 10px; font-weight: 900; z-index: 10;
+            background: rgba(255,255,255,0.8); padding: 0 2px; border-radius: 2px;
         }
 
-        .viz-track {
-            width: 100%; height: 24px; background: #333; border-radius: 12px;
-            position: relative; overflow: hidden; border: 1px solid #444;
-        }
         .viz-song-range {
-            position: absolute; height: 100%; background: rgba(255, 255, 255, 0.2);
-            border-left: 2px solid #fff; border-right: 2px solid #fff;
+            position: absolute; height: 100%; pointer-events: none;
+            background: rgba(52, 152, 219, 0.25);
+            border-left: 3px solid #3498db; border-right: 3px solid #3498db; z-index: 2;
         }
         .viz-user-range {
-            position: absolute; height: 100%; background: rgba(29, 185, 84, 0.6);
-            transition: left 0.1s, width 0.1s;
+            position: absolute; height: 100%; pointer-events: none;
+            background: rgba(29, 185, 84, 0.55);
+            border-top: 4px solid #1DB954; border-bottom: 4px solid #1DB954;
+            transition: left 0.1s, width 0.1s; z-index: 3;
         }
 
         .status-perfect { color: #1DB954; } 
         .status-transpose { color: #ffc107; } 
-        .status-impossible { color: #f44336; } 
+        .status-impossible { color: #e74c3c; } 
     </style>
 </head>
 <body>
 
 <div class="header-panel">
-    <h1>🎙️ Visualizador de Rango Vocal</h1>
-    <p id="instructions">Haz clic en Activar. Canta tu nota más grave y sube hasta la más aguda. Si ocurre un error, presiona Reiniciar.</p>
+    <h1>🎤 ¿Qué canción puedes cantar con tu voz?</h1>
+    <p id="instructions">Freddie Mercury tenía una extensión vocal increíble de casi 4 octavas y podía cantar prácticamente cualquier cosa. <b>¿Y tú?</b> Activa el micrófono, canta tu nota más grave deslizando hasta la más aguda, y descubre cuáles de estas canciones calzan con tu registro.</p>
 
-    <button id="btnStart" class="btn-start" onclick="startSystem()">Activar Micrófono</button>
+    <button id="btnStart" class="btn-start" onclick="startSystem()">Descubrir mi rango</button>
     <button id="btnReset" class="btn-start btn-reset" style="display:none;" onclick="resetRange()">🔄 Reiniciar Rango</button>
 
     <div id="statsPanel" class="live-stats" style="display: none;">
         <div>Grave<br><span id="valMin" class="val">-</span></div>
         <div>Escuchando...<br><span id="valCurrent" class="val" style="color:white;">-</span></div>
         <div>Agudo<br><span id="valMax" class="val">-</span></div>
-        <div>Amplitud<br><span id="valSpan" class="val">0</span> <small>semitonos</small></div>
+        <div>Extensión<br><span id="valSpan" class="val">0</span> <small>semitonos</small></div>
+    </div>
+
+    <div id="storyPanel" class="story-panel" style="display: none;">
+        <div class="story-title">✨ <span id="storyTitle">Calculando tu perfil...</span></div>
+        <div class="story-text" id="storyText">Explora tus graves y agudos para que podamos definir tu tipo de voz.</div>
     </div>
 </div>
 
 <div class="songs-panel">
-    <h2>Lista de canciones</h2>
+    <h2>Lista de Canciones</h2>
+    <p style="color:#aaa; font-size:14px; margin-top:-5px; margin-bottom:20px;">Ordenadas de mayor a menor compatibilidad con tu registro vocal.</p>
     <div id="songsContainer"></div>
 </div>
 
@@ -147,14 +166,23 @@ function sortSongsByRange() {
         if (aIn && bIn) return a.artist_name.localeCompare(b.artist_name, 'es', { sensitivity: 'base' });
         const diffA = outOfRangeDiff(a);
         const diffB = outOfRangeDiff(b);
-        if (diffA !== diffB) return diffB - diffA;
+        if (diffA !== diffB) return diffA - diffB; // Priorizar los que requieren menos semitonos de ajuste
         return a.artist_name.localeCompare(b.artist_name, 'es', { sensitivity: 'base' });
     });
 }
 
-// Ampliamos el lienzo: Cubre desde C2 (36) hasta C7 (96) para asegurar que nada quede fuera.
-const VISUAL_MIN_MIDI = 36; 
-const VISUAL_RANGE_SPAN = 60;
+const VISUAL_MIN_MIDI = 36; // C2
+const VISUAL_RANGE_SPAN = 60; // 5 Octavas exactas (hasta B6)
+
+// Generador del Teclado de Piano HTML
+let pianoHtml = '';
+for (let i = VISUAL_MIN_MIDI; i < VISUAL_MIN_MIDI + VISUAL_RANGE_SPAN; i++) {
+    let note = i % 12;
+    let isBlack = [1,3,6,8,10].includes(note);
+    let isC4 = i === 60; // DO Central
+    let label = isC4 ? '<span class="c4-label">C4</span>' : '';
+    pianoHtml += `<div class="pkey ${isBlack ? 'black' : 'white'}">${label}</div>`;
+}
 
 let audioCtx, analyser, buf;
 let uMin = Infinity, uMax = -Infinity;
@@ -177,6 +205,7 @@ function buildUI() {
                 </div>
 
                 <div class="viz-track">
+                    ${pianoHtml}
                     <div class="viz-song-range" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
                     <div class="viz-user-range" id="uviz-${song.track_name.replace(/\s/g,'')}" style="left: 0%; width: 0%;"></div>
                 </div>
@@ -190,6 +219,7 @@ async function startSystem() {
     document.getElementById("btnReset").style.display = "inline-block";
     document.getElementById("instructions").innerText = "Micrófono activo. Mapeando en tiempo real...";
     document.getElementById("statsPanel").style.display = "flex";
+    document.getElementById("storyPanel").style.display = "flex";
 
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioCtx.createAnalyser();
@@ -208,19 +238,43 @@ async function startSystem() {
 }
 
 function resetRange() {
-    uMin = Infinity;
-    uMax = -Infinity;
+    uMin = Infinity; uMax = -Infinity;
     document.getElementById("valMin").innerText = "-";
     document.getElementById("valMax").innerText = "-";
     document.getElementById("valSpan").innerText = "0";
+    document.getElementById("storyTitle").innerText = "Calculando tu perfil...";
+    document.getElementById("storyText").innerText = "Explora tus graves y agudos para que podamos definir tu tipo de voz.";
 
     songs.forEach(song => {
         const id = song.track_name.replace(/\s/g,'');
         document.getElementById("feedback-" + id).innerText = "Esperando tu voz...";
         document.getElementById("feedback-" + id).className = "feedback-text";
-        const viz = document.getElementById("uviz-" + id);
-        viz.style.width = "0%";
+        document.getElementById("uviz-" + id).style.width = "0%";
     });
+}
+
+function updateVoiceStory() {
+    if (uMin === Infinity || uMax === -Infinity) return;
+    const titleEl = document.getElementById("storyTitle");
+    const textEl = document.getElementById("storyText");
+    const span = uMax - uMin;
+
+    if (span < 5) {
+        titleEl.innerText = "Reconociendo voz...";
+        textEl.innerText = "Sigue subiendo o bajando. Aún no tenemos datos suficientes para definir tu perfil.";
+    } else if (span >= 30) {
+        titleEl.innerText = "¡Rango Extendido (Nivel Freddie Mercury)!";
+        textEl.innerText = "¡Increíble! Tienes una elasticidad envidiable (más de dos octavas y media). Tienes el control para adaptar casi cualquier hit mundial a tu voz.";
+    } else if (uMin <= 48 && uMax <= 70) {
+        titleEl.innerText = "Voz Profunda (Bajo / Barítono / Contralto)";
+        textEl.innerText = "Tienes un tono sólido y resonante en los graves. Tu voz es ideal para anclar melodías. ¡Piensa en artistas como Arctic Monkeys o Adele en sus notas bajas!";
+    } else if (uMax >= 75 && uMin >= 55) {
+        titleEl.innerText = "Voz Aguda (Tenor / Soprano)";
+        textEl.innerText = "¡Brillas en las alturas! Tienes facilidad natural para los agudos que dominan el pop moderno. The Weeknd, Bruno Mars o Ariana Grande están en tu zona.";
+    } else {
+        titleEl.innerText = "Registro Versátil Medio";
+        textEl.innerText = "¡Tienes el registro más útil de la música! Te mueves con comodidad en la zona central, lo que te permite cantar la inmensa mayoría de canciones populares sin forzar la garganta.";
+    }
 }
 
 function detectPitch() {
@@ -228,10 +282,8 @@ function detectPitch() {
     analyser.getFloat32TimeDomainData(buf);
     let freq = autoCorrelate(buf, audioCtx.sampleRate);
 
-    // Se ajustaron los límites de Hertzios para filtrar mejor
     if (freq > 65 && freq < 1050) { 
         let midi = Math.round(12 * Math.log2(freq / 440) + 69);
-
         if (midi >= 36 && midi <= 96) {
             document.getElementById("valCurrent").innerText = midiToNote(midi);
             let changed = false;
@@ -241,6 +293,7 @@ function detectPitch() {
 
             if (changed) {
                 document.getElementById("valSpan").innerText = (uMax - uMin);
+                updateVoiceStory(); 
                 updateVisualizations(); 
             }
         }
@@ -263,32 +316,59 @@ function updateVisualizations() {
         const id = song.track_name.replace(/\s/g,'');
 
         const feedbackEl = document.getElementById("feedback-" + id);
-
-        // BUG CORREGIDO: Ya no usamos Math.max. La posición es exacta aunque salgas del límite visual.
         const viz = document.getElementById("uviz-" + id);
+
         const leftP = ((uMin - VISUAL_MIN_MIDI) / VISUAL_RANGE_SPAN) * 100;
         const widthP = (uSpan / VISUAL_RANGE_SPAN) * 100;
         viz.style.left = leftP + "%";
         viz.style.width = widthP + "%";
 
         if (sSpan > uSpan) {
-            feedbackEl.innerText = `❌ Imposible. Pide ${sSpan} semitonos de amplitud, tú tienes ${uSpan}.`;
+            feedbackEl.innerText = `❌ Pide ${sSpan} semitonos de amplitud y tienes ${uSpan}.`;
             feedbackEl.className = "feedback-text status-impossible";
-        } 
-        else if (uMin <= sMin && uMax >= sMax) {
-            feedbackEl.innerText = "✅ ¡Perfecto! Llegas a los graves y agudos originales.";
-            feedbackEl.className = "feedback-text status-perfect";
-        } 
-        else {
-            // Tienes la amplitud, pero estás desfasado.
-            if (uMax < sMax) {
-                let bajar = sMax - uMax;
-                feedbackEl.innerText = `⚠️ Te faltan agudos. Tienes que transportarla -${bajar} semitonos.`;
-            } else if (uMin > sMin) {
-                let subir = uMin - sMin;
-                feedbackEl.innerText = `⚠️ Te faltan graves. Tienes que transportarla +${subir} semitonos.`;
+        } else {
+            // Lógica de Sentido Musical y Octavas
+            let bestShift = null;
+            let minAbsTrans = Infinity;
+            let bestOct = 0;
+
+            for (let oct = -2; oct <= 2; oct++) {
+                let octShift = oct * 12;
+                let shiftedSMin = sMin + octShift;
+                let shiftedSMax = sMax + octShift;
+
+                let minT = uMin - shiftedSMin;
+                let maxT = uMax - shiftedSMax;
+                let T = 0;
+
+                if (minT > 0) T = minT;
+                else if (maxT < 0) T = maxT;
+
+                if (Math.abs(T) < minAbsTrans) {
+                    minAbsTrans = Math.abs(T);
+                    bestShift = T;
+                    bestOct = oct;
+                }
             }
-            feedbackEl.className = "feedback-text status-transpose";
+
+            if (minAbsTrans === 0) {
+                if (bestOct === 0) {
+                    feedbackEl.innerText = "✅ ¡Perfecta en su tono original!";
+                } else {
+                    let dir = bestOct < 0 ? "más grave" : "más aguda";
+                    feedbackEl.innerText = `✅ Perfecta si la cantas ${Math.abs(bestOct)} octava(s) ${dir}.`;
+                }
+                feedbackEl.className = "feedback-text status-perfect";
+            } else {
+                let octMsg = "";
+                if (bestOct !== 0) {
+                    let dir = bestOct < 0 ? "más grave" : "más aguda";
+                    octMsg = ` (cantando ${Math.abs(bestOct)} octava ${dir})`;
+                }
+                let signo = bestShift > 0 ? "+" : "";
+                feedbackEl.innerText = `⚠️ Transporta ${signo}${bestShift} semitonos${octMsg}.`;
+                feedbackEl.className = "feedback-text status-transpose";
+            }
         }
     });
 }
@@ -297,7 +377,6 @@ function autoCorrelate(buf, sampleRate) {
     let SIZE = buf.length; let rms = 0;
     for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
     rms = Math.sqrt(rms / SIZE);
-    // Aumentado el umbral de ruido para evitar chasquidos (0.01 a 0.02)
     if (rms < 0.02) return -1;
     let r1 = 0, r2 = SIZE - 1, thres = 0.2;
     for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
