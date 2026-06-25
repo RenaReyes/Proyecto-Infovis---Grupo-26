@@ -10,18 +10,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #121212; color: #ffffff;
             margin: 0; padding: 20px;
+            box-sizing: border-box;
         }
+        * { box-sizing: inherit; }
 
-        /* DISEÑO DE 2 COLUMNAS */
+        /* DISEÑO DE 2 COLUMNAS (ESCRITORIO) */
         .main-layout {
             display: flex; gap: 30px; align-items: flex-start;
             max-width: 1400px; margin: 0 auto;
         }
 
-        /* COLUMNA IZQUIERDA (Fija/Sticky) */
+        /* COLUMNA IZQUIERDA (CONTROLES FIJOS) */
         .left-col {
             flex: 0 0 380px;
-            position: sticky; top: 20px; /* Se queda pegada al hacer scroll */
+            position: sticky; top: 20px;
         }
         .header-panel {
             background: #1e1e1e; padding: 30px 20px; border-radius: 12px;
@@ -51,25 +53,32 @@
         .story-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
         .story-text { font-size: 15px; opacity: 0.95; line-height: 1.5; }
 
-        /* COLUMNA DERECHA (Lista de Canciones y Matriz) */
+        /* COLUMNA DERECHA (MATRIZ INFOVIS) */
         .right-col { flex: 1; min-width: 0; }
 
         .infovis-board {
             background: #1b1b1b; border: 1px solid #2a2a2a; border-radius: 16px;
-            overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-            position: relative;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25); position: relative;
+            /* Eliminamos overflow: hidden para que el sticky del header funcione respecto al body */
         }
 
-        /* ESTRUCTURA DE FILAS (Gantt Chart Layout) */
+        /* ESTRUCTURA DE FILAS */
         .row-flex { display: flex; width: 100%; border-bottom: 1px solid #252525; }
-        .info-space { flex: 0 0 280px; padding: 15px; box-sizing: border-box; background: #1e1e1e; z-index: 2; }
-        .track-space { flex: 1; position: relative; padding: 0; box-sizing: border-box; }
+        .info-space { flex: 0 0 280px; padding: 15px; background: #1e1e1e; z-index: 2; }
+        .track-space { flex: 1; position: relative; padding: 0; }
 
-        /* Cabecera del Piano */
-        .board-header .info-space { background: #111; display: flex; align-items: center; justify-content: center; }
+        /* CABECERA FIJA DEL PIANO */
+        .board-header {
+            position: sticky; top: 0; z-index: 20;
+            background: #1b1b1b;
+            border-top-left-radius: 16px; border-top-right-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4); /* Sombra al hacer scroll */
+        }
+        .board-header .info-space { background: #111; display: flex; align-items: center; justify-content: center; border-top-left-radius: 16px; }
         .board-header h2 { margin: 0; font-size: 18px; color: #fff; }
-        .piano-container { display: flex; height: 40px; background: #000; border-bottom: 2px solid #333; }
-        .pkey { flex: 1; position: relative; box-sizing: border-box; }
+
+        .piano-container { display: flex; height: 40px; background: #000; border-bottom: 2px solid #333; border-top-right-radius: 16px; overflow: hidden; }
+        .pkey { flex: 1; position: relative; }
         .pkey.white { background: #eaeaea; border-right: 1px solid #bbb; border-bottom: 1px solid #ccc; }
         .pkey.black { background: #1a1a1a; z-index: 3; border-right: 1px solid #000; }
         .c4-label {
@@ -78,40 +87,72 @@
             background: rgba(255,255,255,0.8); padding: 0 2px; border-radius: 2px;
         }
 
-        /* Estilos de las tarjetas de canciones */
-        #songsContainer { display: flex; flex-direction: column; position: relative; }
+        /* TARJETAS DE CANCIONES */
+        #songsContainer { display: flex; flex-direction: column; position: relative; padding-bottom: 20px; }
         .song-row { background: transparent; transition: background 0.2s; }
         .song-row:hover { background: rgba(255,255,255,0.02); }
         .song-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
         .song-artist { font-size: 13px; color: #aaa; margin-bottom: 8px; }
         .feedback-text { font-size: 13px; font-weight: 600; line-height: 1.3; }
 
-        /* LAS BARRAS VISUALES */
+        /* LA HUELLA DE LA CANCIÓN */
         .viz-song-range {
             position: absolute; top: 50%; transform: translateY(-50%); height: 16px;
             background: rgba(52, 152, 219, 0.4); border: 1px solid #3498db;
             border-radius: 4px; pointer-events: none; z-index: 5;
         }
 
-        /* LA MAGIA: LA BARRA VERDE GLOBAL */
+        /* LA MATRIZ: BARRA VERDE GLOBAL (ESCRITORIO) */
         .bg-layer { position: absolute; top: 0; bottom: 0; left: 0; right: 0; display: flex; pointer-events: none; z-index: 1; }
         .bg-layer .info-space { background: transparent; border: none; }
         .bg-layer .track-space { position: relative; border-left: 2px solid #333; background: rgba(0,0,0,0.2); }
 
         #globalUserRange {
             position: absolute; top: 0; bottom: 0;
-            background: rgba(29, 185, 84, 0.15); /* Verde translúcido que cruza todo */
-            border-left: 2px solid #1DB954; border-right: 2px solid #1DB954;
-            transition: left 0.1s, width 0.1s;
-            box-shadow: 0 0 20px rgba(29, 185, 84, 0.1);
+            background: rgba(29, 185, 84, 0.15); border-left: 2px solid #1DB954; border-right: 2px solid #1DB954;
+            transition: left 0.1s, width 0.1s; box-shadow: 0 0 20px rgba(29, 185, 84, 0.1);
         }
 
-        /* Colores de estado */
+        /* BARRAS INDIVIDUALES VERDES (Ocultas en escritorio, activas en móvil) */
+        .viz-user-range { display: none; }
+
+        /* COLORES SEMÁFORO */
         .status-perfect { color: #1DB954; } 
         .status-transpose { color: #ffc107; } 
         .status-impossible { color: #e74c3c; } 
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ========================================= */
+        /* DISEÑO RESPONSIVO (MÓVILES Y TABLETS)     */
+        /* ========================================= */
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; gap: 20px; }
+            .left-col { position: static; flex: auto; width: 100%; }
+            .right-col { width: 100%; }
+
+            /* Ajuste de filas a bloques verticales */
+            .row-flex { flex-direction: column; border-bottom: 2px solid #333; }
+            .info-space { width: 100%; flex: auto; padding: 15px; padding-bottom: 5px; }
+            .track-space { width: 100%; flex: auto; height: 50px; }
+
+            /* Ajuste del Header y Piano Sticky para celular */
+            .board-header { border-radius: 0; border-bottom: 2px solid #1DB954; }
+            .board-header .info-space { display: none; } /* Oculta caja vacía */
+            .piano-container { border-radius: 0; height: 35px; border: none; }
+
+            /* Textos apilados */
+            .song-info { display: flex; flex-direction: column; gap: 5px; }
+            .feedback-text { text-align: left; max-width: 100%; padding-top: 5px; }
+
+            /* APAGAMOS LA BARRA GLOBAL, PRENDEMOS LAS BARRAS LOCALES */
+            .bg-layer { display: none; }
+            .viz-user-range {
+                display: block; position: absolute; height: 100%; pointer-events: none;
+                background: rgba(29, 185, 84, 0.4); border-top: 3px solid #1DB954; border-bottom: 3px solid #1DB954;
+                transition: left 0.1s, width 0.1s; z-index: 3;
+            }
+            .viz-song-range { height: 12px; z-index: 4; }
+        }
     </style>
 </head>
 <body>
@@ -166,7 +207,6 @@
 </div>
 
 <script>
-// Compatibilidad micrófono VS Code
 if (window.AnalyserNode && !window.AnalyserNode.prototype.getFloat32TimeDomainData) {
     let uint8 = new Uint8Array(2048);
     window.AnalyserNode.prototype.getFloat32TimeDomainData = function(array) {
@@ -183,10 +223,9 @@ function midiToNote(midi) {
     return NOTE_NAMES[midi % 12] + (Math.floor(midi / 12) - 1);
 }
 
-const VISUAL_MIN_MIDI = 36; // C2
-const VISUAL_RANGE_SPAN = 60; // 5 Octavas exactas (hasta B6)
+const VISUAL_MIN_MIDI = 36; 
+const VISUAL_RANGE_SPAN = 60; 
 
-// 1. Construir el Piano de la Cabecera
 let pianoHtml = '';
 for (let i = VISUAL_MIN_MIDI; i < VISUAL_MIN_MIDI + VISUAL_RANGE_SPAN; i++) {
     let note = i % 12;
@@ -201,7 +240,6 @@ let audioCtx, analyser, buf;
 let uMin = Infinity, uMax = -Infinity;
 let isListening = false;
 
-// 2. Construir la estructura de Filas (Gantt Chart)
 function buildInitialUI() {
     const container = document.getElementById("songsContainer");
     container.innerHTML = "";
@@ -220,6 +258,7 @@ function buildInitialUI() {
                 </div>
                 <div class="track-space">
                     <div class="viz-song-range" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
+                    <div class="viz-user-range" id="uviz-${song.track_name.replace(/\s/g,'')}" style="left: 0%; width: 0%;"></div>
                 </div>
             </div>
         `;
@@ -257,13 +296,13 @@ function resetRange() {
     document.getElementById("storyTitle").innerText = "Calculando tu perfil...";
     document.getElementById("storyText").innerText = "Explora tus graves y agudos para que podamos definir tu tipo de voz.";
 
-    // Resetear barra global
     document.getElementById("globalUserRange").style.width = "0%";
 
     songs.forEach((song, index) => {
         const id = song.track_name.replace(/\s/g,'');
         document.getElementById("feedback-" + id).innerText = "Esperando tu voz...";
         document.getElementById("feedback-" + id).className = "feedback-text";
+        document.getElementById("uviz-" + id).style.width = "0%";
         document.getElementById("card-" + id).style.order = index;
     });
 }
@@ -318,22 +357,19 @@ function detectPitch() {
 
 function updateVisualizations() {
     if (uMin === Infinity || uMax === -Infinity) return;
-
     const uSpan = uMax - uMin;
 
-    // 1. Actualizar la ÚNICA BARRA GLOBAL de usuario
+    // 1. Matriz Global (Escritorio)
     const globalViz = document.getElementById("globalUserRange");
     const globalLeftP = ((uMin - VISUAL_MIN_MIDI) / VISUAL_RANGE_SPAN) * 100;
     const globalWidthP = (uSpan / VISUAL_RANGE_SPAN) * 100;
     globalViz.style.left = globalLeftP + "%";
     globalViz.style.width = globalWidthP + "%";
 
-    // 2. Calcular categorías de semáforo
     songs.forEach(song => {
         song.sSpan = song.max_midi - song.min_midi;
-
         if (song.sSpan > uSpan) {
-            song.cat = 3; // Rojo
+            song.cat = 3; 
             song.spanDiff = song.sSpan - uSpan; 
         } else {
             let bestT = 0, minRem = Infinity, bestOct = 0;
@@ -350,11 +386,10 @@ function updateVisualizations() {
             }
             song.minRem = minRem; 
             song.bestOct = bestOct; 
-            song.cat = (minRem === 0) ? 1 : 2; // 1 = Verde, 2 = Amarillo
+            song.cat = (minRem === 0) ? 1 : 2; 
         }
     });
 
-    // 3. Reordenamiento visual Flexbox
     let sortedSongs = [...songs];
     sortedSongs.sort((a, b) => {
         if (a.cat !== b.cat) return a.cat - b.cat;
@@ -369,7 +404,12 @@ function updateVisualizations() {
         const cardEl = document.getElementById("card-" + id);
         const feedbackEl = document.getElementById("feedback-" + id);
 
-        cardEl.style.order = visualIndex; // Reordenamiento sin parpadeos
+        cardEl.style.order = visualIndex; 
+
+        // 2. Barras individuales (Móvil)
+        const localViz = document.getElementById("uviz-" + id);
+        localViz.style.left = globalLeftP + "%";
+        localViz.style.width = globalWidthP + "%";
 
         if (song.cat === 3) {
             feedbackEl.innerText = `❌ Imposible. Faltan ${song.spanDiff} semitonos de extensión.`;
